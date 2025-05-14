@@ -6,4 +6,4 @@ Activation sparsity provides a dynamic, input-dependent alternative to weight pr
 
 ### Reproduce results
 
-Download huggingface models and run [reproduce.ipynb][reproduce.ipynb]
+Download huggingface models and run [reproduce.ipynb](reproduce.ipynb)
