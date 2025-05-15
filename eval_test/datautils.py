@@ -11,27 +11,6 @@ def set_seed(seed):
     torch.random.manual_seed(seed)
 
 
-
-
-def get_pile(nsamples, seed, seqlen, model):
-    print("get_pile")
-    traindata = load_dataset("json", data_files='/cpfs01/user/chenmengzhao/prompt_quantization/val.jsonl.zst', split="train")
-
-    tokenizer = AutoTokenizer.from_pretrained(model, use_fast=False)
-    trainenc = tokenizer("\n\n".join(traindata['text'][:1000]), return_tensors='pt')
-
-    random.seed(seed)
-    trainloader = []
-    for _ in range(nsamples):
-        i = random.randint(0, trainenc.input_ids.shape[1] - seqlen - 1)
-        j = i + seqlen
-        inp = trainenc.input_ids[:, i:j]
-        tar = inp.clone()
-        tar[:, :-1] = -100
-        trainloader.append((inp, tar))
-    return trainloader, None
-
-
 def get_wikitext2(nsamples, seed, seqlen, model):
     print("get_wikitext2")
     traindata = load_dataset('wikitext', 'wikitext-2-raw-v1', split='train')
@@ -143,10 +122,10 @@ def get_ptb_new(nsamples, seed, seqlen, model):
 def get_c4_new(nsamples, seed, seqlen, model):
     print("get_c4_new")
     traindata = load_dataset(
-        'json', data_files={'train': '/dataset/ming/datasets/c4/en/c4-train.00000-of-01024.json'}, split='train'
+        'allenai/c4', data_files={'train': 'en/c4-train.00000-of-01024.json.gz'}, split='train'
     )
     valdata = load_dataset(
-        'json', data_files={'validation': '/dataset/ming/datasets/c4/en/c4-validation.00000-of-00008.json'}, split='validation'
+        'allenai/c4', data_files={'validation': 'en/c4-validation.00000-of-00008.json.gz'}, split='validation'
     )
 
     tokenizer = AutoTokenizer.from_pretrained(model, use_fast=False)
@@ -181,8 +160,6 @@ def get_loaders(
 ):
     if 'wikitext2' in name:
         return get_wikitext2(nsamples, seed, seqlen, model)
-    if 'pile' in name:
-        return get_pile(nsamples, seed, seqlen, model)
     if 'ptb' in name:
         if 'new' in name:
             return get_ptb_new(nsamples, seed, seqlen, model)  
